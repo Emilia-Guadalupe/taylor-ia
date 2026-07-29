@@ -418,7 +418,11 @@ export default function AtsResumeBuilder({
         <button type="button" className="brass-button" onClick={handleDownload} disabled={downloading}>
           <span>{downloading ? t.downloadingButton : t.downloadButton}</span>
         </button>
-        {downloadError && <p className="measure-hint error">{downloadError}</p>}
+        {downloadError && (
+          <p className="measure-hint error" role="alert">
+            {downloadError}
+          </p>
+        )}
       </div>
     </div>
   );

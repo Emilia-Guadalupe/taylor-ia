@@ -2,6 +2,7 @@ export type Lang = "en" | "es";
 
 export interface Translation {
   pageTitle: string;
+  skipToContent: string;
   brandName: string;
   brandTag: string;
   heroTitleLines: [string, string];
@@ -95,6 +96,7 @@ export interface Translation {
 export const translations: Record<Lang, Translation> = {
   en: {
     pageTitle: "A CV tailored to you",
+    skipToContent: "Skip to main content",
     brandName: "Tailor.ia",
     brandTag: "measure twice, apply once",
     heroTitleLines: ["Cut your resume", "to fit the job."],
@@ -191,6 +193,7 @@ export const translations: Record<Lang, Translation> = {
   },
   es: {
     pageTitle: "CV a tu medida",
+    skipToContent: "Ir al contenido principal",
     brandName: "Sastre.ia",
     brandTag: "Un CV a tu medida",
     heroTitleLines: ["Ajustá tu CV", "a la postulación."],

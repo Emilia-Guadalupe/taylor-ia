@@ -6,14 +6,14 @@ import Providers from "./providers";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["600", "700"],
   variable: "--font-display",
   display: "swap",
 });
 
 const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
   variable: "--font-body",
   display: "swap",
 });

@@ -65,10 +65,14 @@ export default function Home() {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        {t.skipToContent}
+      </a>
+
       <header className="topbar">
         <div className="topbar-left">
           <div className="brand">
-            <span className="brand-mark">✂</span>
+            <span className="brand-mark" aria-hidden="true">✂</span>
             <span className="brand-word">{t.brandName}</span>
           </div>
           <p className="brand-tag">{t.brandTag}</p>
@@ -76,7 +80,7 @@ export default function Home() {
         <LanguageToggle />
       </header>
 
-      <main className="workshop">
+      <main className="workshop" id="main-content">
         <section className="hero">
           <h1>
             {t.heroTitleLines[0]}
@@ -99,9 +103,10 @@ export default function Home() {
 
           <div className="panel slip-panel">
             <div className="panel-label">{t.panelLabel2}</div>
-            <h2>{t.jobPosting}</h2>
+            <h2 id="job-posting-heading">{t.jobPosting}</h2>
             <textarea
               className="job-textarea"
+              aria-labelledby="job-posting-heading"
               value={jobText}
               onChange={(e) => setJobText(e.target.value)}
               placeholder={t.jobPlaceholder}
@@ -113,7 +118,12 @@ export default function Home() {
           <button className="brass-button" onClick={handleAnalyze} disabled={loading}>
             <span>{loading ? t.measuringButton : t.measureButton}</span>
           </button>
-          <p className={`measure-hint ${statusIsError ? "error" : ""}`}>{status}</p>
+          <p
+            className={`measure-hint ${statusIsError ? "error" : ""}`}
+            role={statusIsError ? "alert" : "status"}
+          >
+            {status}
+          </p>
         </div>
 
         {results && (
