@@ -17,7 +17,11 @@ Two separate apps, both Node/JavaScript: an **Express JSON API** and a
 ```
 resume-tailor/
 ├── backend/                     Express JSON API
-│   ├── server.js                Routes: /api/analyze, /api/export-resume, /api/health
+│   ├── server.js                Routes: /api/analyze, /api/export-resume, /api/health;
+│   │                             exports `app` for Vercel, listens locally otherwise
+│   ├── api/
+│   │   └── index.js             Vercel serverless entry point (re-exports `app`)
+│   ├── vercel.json               rewrites every request to api/index.js
 │   ├── src/
 │   │   ├── resumeParser.js      .docx / .pdf → plain text (mammoth + unpdf) + contact hints
 │   │   ├── keywordMatcher.js    keyword extraction + gap analysis (no AI needed)
@@ -163,6 +167,45 @@ Known backend error messages (e.g. "Please upload a resume...") are also
 translated on the frontend via an exact-match table in `i18n.js`. Anything
 dynamic that comes straight from the Anthropic API (e.g. a raw upstream error
 string) is shown as-is, since it can't be safely translated without guessing.
+
+## Deploying to Vercel
+
+Both apps deploy to Vercel, but as **two separate Vercel projects** from the
+same repo (Vercel doesn't run a persistent Express server — the backend
+deploys as a serverless function instead).
+
+Push the repo to GitHub first, then in Vercel:
+
+### 1. Backend project
+
+- **Add New Project** → import the repo → set **Root Directory** to `backend`.
+- Vercel auto-detects `backend/api/index.js` as a serverless function;
+  `backend/vercel.json` rewrites every request to it so Express's own
+  routing (`/api/analyze`, `/api/export-resume`, `/api/health`) still works.
+- Environment variables (Project Settings → Environment Variables):
+  - `ANTHROPIC_API_KEY` — required for AI suggestions
+  - `ANTHROPIC_MODEL` — optional, same default as local
+  - `FRONTEND_ORIGIN` — set this **after** the frontend project exists, to
+    its `https://….vercel.app` URL (CORS blocks everything else)
+- Deploy, then copy the resulting URL (e.g. `https://tailor-backend.vercel.app`).
+
+### 2. Frontend project
+
+- **Add New Project** again on the same repo → **Root Directory** = `frontend`.
+  Next.js needs no extra config.
+- Environment variable: `NEXT_PUBLIC_API_URL` = the backend URL from step 1.
+- Deploy, then go back to the backend project and set `FRONTEND_ORIGIN` to
+  this frontend URL, and redeploy the backend so CORS picks it up.
+
+### Caveats specific to serverless
+
+- Vercel's default request body size limit (currently 4.5 MB on the Hobby
+  plan) is smaller than the app's own 10 MB multer limit — in practice
+  resume files are almost always well under that, but a very large upload
+  will be rejected by Vercel before it reaches the multer check.
+- Serverless functions are stateless per-invocation, which this app already
+  assumes (no in-memory state between requests), so no code changes were
+  needed beyond exporting the Express `app` and guarding `app.listen()`.
 
 ## Notes / limits
 

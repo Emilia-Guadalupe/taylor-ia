@@ -2,8 +2,13 @@
  * server.js
  * Pure JSON API exposing resume parsing, keyword-gap matching, and AI
  * suggestions. The frontend is a separate Next.js app in /frontend.
+ *
+ * Exports the Express `app` (used by api/index.js as a Vercel serverless
+ * function) and only calls app.listen() when run directly with `node
+ * server.js`, so the same file works both locally and on Vercel.
  */
 import "dotenv/config";
+import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
 import multer from "multer";
@@ -142,6 +147,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Unexpected server error." });
 });
 
-app.listen(PORT, () => {
-  console.log(`Tailor backend running on http://localhost:${PORT}`);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  app.listen(PORT, () => {
+    console.log(`Tailor backend running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
